@@ -26,18 +26,19 @@ function _getManifestData(file, opts) {
             return;
         }
         if (_.isObject(json)) {
-            var isRev = 1;
-            Object.keys(json).forEach(function (key) {
-                if ( path.basename(json[key]).replace(new RegExp( opts.revSuffix ), '' ) !==  path.basename(key) ) {
-                    isRev = 0;
-                }
-            });
-            
-            if (isRev) {
-                data = json;
-            }
+            // var isRev = 1;
+            // Object.keys(json).forEach(function (key) {
+            //     if ( path.basename(json[key]).replace(new RegExp( opts.revSuffix ), '' ) !==  path.basename(key) ) {
+            //         isRev = 0;
+            //     }
+            // });
+            //
+            // if (isRev) {
+            //     data = json;
+            // }
+            data = json;
         }
-        
+
     }
     return data;
 }
@@ -52,7 +53,7 @@ function closeDirBySep(dirname) {
 
 function revCollector(opts) {
     opts = _.defaults((opts || {}), defaults);
-    
+
     var manifest  = {};
     var mutables = [];
     return through.obj(function (file, enc, cb) {
@@ -80,8 +81,8 @@ function revCollector(opts) {
         for (var key in manifest) {
             var patterns = [ escPathPattern(key) ];
             if (opts.replaceReved) {
-                patterns.push( escPathPattern( (path.dirname(key) === '.' ? '' : closeDirBySep(path.dirname(key)) ) + path.basename(key, path.extname(key)) ) 
-                            + opts.revSuffix 
+                patterns.push( escPathPattern( (path.dirname(key) === '.' ? '' : closeDirBySep(path.dirname(key)) ) + path.basename(key, path.extname(key)) )
+                            + opts.revSuffix
                             + escPathPattern( path.extname(key) )
                         );
             }
@@ -92,8 +93,8 @@ function revCollector(opts) {
                         changes.push({
                             regexp: new RegExp(  dirRule.dirRX + pattern, 'g' ),
                             patternLength: (dirRule.dirRX + pattern).length,
-                            replacement: _.isFunction(dirRule.dirRpl) 
-                                            ? dirRule.dirRpl(manifest[key]) 
+                            replacement: _.isFunction(dirRule.dirRpl)
+                                            ? dirRule.dirRpl(manifest[key])
                                             : closeDirBySep(dirRule.dirRpl) + manifest[key]
                         });
                     });
@@ -126,7 +127,7 @@ function revCollector(opts) {
             }
             this.push(file);
         }, this);
-        
+
         cb();
     });
 }
